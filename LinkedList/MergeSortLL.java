@@ -1,101 +1,121 @@
-import java.util.*;
-public class MergeSortLL {
-        public static class Node {
-            int data;
-            Node next;
-        public Node(int data) {
-            this.data= data;
-            this.next = null;
-        }
-        }
-        public static Node head;
-        public static Node tail;
-        public void addFirst(int data) {
-            //step 1 - Create a node
-            Node newnode=new Node(data);
-            if(head==null) {
-                head = tail=newnode;
-                return;
-            }
-            //step 2 - newnode.next=head
-            newnode.next=head;
-            //step 3
-            head=newnode;
-            }
+import java.util.Scanner;
 
-            //To print LL 
-    public void print() {
-    if(head==null) {
-        System.out.println("LL is empty");
-        return;
+class Node {
+    int data;
+    Node next;
+
+    Node(int data) {
+        this.data = data;
+        this.next = null;
     }
-    Node temp=head;
-    while(temp!=null) {
-        System.out.print(temp.data+"->");
-        temp=temp.next;
-    }
-    System.out.println("null");
 }
-private Node getMid(Node head){
-     //slow-fast approach
-     Node slow = head;
-     Node fast = head.next;
-     while(fast!=null && fast.next!=null) {
-         slow=slow.next; //+1
-         fast=fast.next.next; //+2
-     }
-     return slow; //mid Node of LL
- }
- private Node merge(Node head1, Node head2) {
-    Node mergedLL = new Node(-1);
-    Node temp = mergedLL;
-    while (head1 != null && head2 != null) {
-        if (head1.data <= head2.data) {
-            temp.next = head1;
-            head1 = head1.next;
+
+class LinkedList {
+    Node head;
+
+    LinkedList() {
+        head = null;
+    }
+
+    void addNode(int data) {
+        Node newNode = new Node(data);
+        if (head == null) {
+            head = newNode;
         } else {
-            temp.next = head2;
-            head2 = head2.next;
+            Node temp = head;
+            while (temp.next != null) {
+                temp = temp.next;
+            }
+            temp.next = newNode;
         }
-        temp = temp.next;
     }
-    if (head1 != null) {
-        temp.next = head1;
+
+    void display() {
+        Node temp = head;
+        while (temp != null) {
+            System.out.print(temp.data + " -> ");
+            temp = temp.next;
+        }
+        System.out.println("null");
     }
-    if (head2 != null) {
-        temp.next = head2;
+
+    Node mergeSort(Node node) {
+        if (node == null || node.next == null) {
+            return node;
+        }
+
+        Node middle = getMiddle(node);
+        Node nextOfMiddle = middle.next;
+        middle.next = null;
+
+        Node left = mergeSort(node);
+        Node right = mergeSort(nextOfMiddle);
+
+        return merge(left, right);
     }
-    return mergedLL.next;
-}
-public Node mergeSort(Node head) {
-    if (head == null || head.next == null) {
-        return head;
+
+    Node merge(Node left, Node right) {
+        if (left == null) {
+            return right;
+        }
+        if (right == null) {
+            return left;
+        }
+
+        Node result;
+        if (left.data <= right.data) {
+            result = left;
+            result.next = merge(left.next, right);
+        } else {
+            result = right;
+            result.next = merge(left, right.next);
+        }
+        return result;
     }
-    // findMid
-    Node mid = getMid(head);
-    // left & right MS
-    Node rightHead = mid.next;
-    mid.next = null;
-    Node newLeft = mergeSort(head);
-    Node newRight = mergeSort(rightHead);
-    // merge
-    return merge(newLeft, newRight);
-}
-public static void main(String[] args) {
-    MergeSortLL ll = new MergeSortLL();
-    ll.addFirst(1);
-    ll.addFirst(2);
-    ll.addFirst(3);
-    ll.addFirst(4);
-    ll.addFirst(5);
-    ll.print();
-    ll.head = ll.mergeSort(ll.head);
-    ll.print();
-}
+
+    Node getMiddle(Node node) {
+        if (node == null) {
+            return node;
+        }
+
+        Node slow = node;
+        Node fast = node.next;
+
+        while (fast != null) {
+            fast = fast.next;
+            if (fast != null) {
+                slow = slow.next;
+                fast = fast.next;
+            }
+        }
+
+        return slow;
+    }
 }
 
+public class Main {
+    public static void main(String[] args) {
+        LinkedList linkedList = new LinkedList();
+        Scanner scanner = new Scanner(System.in);
 
+        System.out.print("Enter the number of elements: ");
+        int n = scanner.nextInt();
 
+        System.out.println("Enter the elements:");
+        for (int i = 0; i < n; i++) {
+            int data = scanner.nextInt();
+            linkedList.addNode(data);
+        }
+
+        System.out.println("Original Linked List:");
+        linkedList.display();
+
+        linkedList.head = linkedList.mergeSort(linkedList.head);
+
+        System.out.println("Sorted Linked List:");
+        linkedList.display();
+    }
+}
 // SortList Leetcode 148 solution
 // class Solution {
 //     public ListNode sortList(ListNode head) {
